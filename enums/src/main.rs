@@ -4,13 +4,13 @@ fn main() {
         V6
     }
 
-    let four: IpAddrKind = IpAddrKind::V4;
-    let six: IpAddrKind = IpAddrKind::V6;
+    let _four: IpAddrKind = IpAddrKind::V4;
+    let _six: IpAddrKind = IpAddrKind::V6;
 
-    fn route(ip_kind: IpAddrKind) {}
+    fn route(_ip_kind: IpAddrKind) {}
 
-    route(ip_kind: IpAddrKind::V4);
-    route(ip_kind: IpAddrKind::V6);
+    route(IpAddrKind::V4);
+    route(IpAddrKind::V6);
 
     // Using strucs
     struct IpAddr {
@@ -18,14 +18,14 @@ fn main() {
         addres: String
     }
 
-    let home: IpAddr = IpAddr {
+    let _home: IpAddr = IpAddr {
         kind: IpAddrKind::V4,
-        addres: String::from("127.0.0.1");
+        addres: String::from("127.0.0.1")
     };
 
-    let loopback: IpAddr = IpAddr {
+    let _loopback: IpAddr = IpAddr {
         kind: IpAddrKind::V6,
-        addres: String::from("::1");
+        addres: String::from("::1")
     };
 
     // ----------------
@@ -35,17 +35,17 @@ fn main() {
         V6(String)
     }
 
-    let home = IpAddrKindType::V4(String::from("127.0.0.1"));
-    let loopback = IpAddrKindType::V6(String::from("::1"));
+    let _home = IpAddrKindType::V4(String::from("127.0.0.1"));
+    let _loopback = IpAddrKindType::V6(String::from("::1"));
 
     //-----------
     // Using enhance enums
     enum IpAddrEnhance {
-        v4(u8,u8,u8,u8),
+        V4(u8,u8,u8,u8),
         V6(String)
     }
 
-    let homeEnhance = IpAddrEnhance::V4(127,0,0,1);
-    let loopbackEnhance = IpAddrKindType::V6(String::from("::1"));
+    let _home_enhance = IpAddrEnhance::V4(127,0,0,1);
+    let _loopback_enhance = IpAddrKindType::V6(String::from("::1"));
 
 }

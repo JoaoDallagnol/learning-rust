@@ -2,7 +2,7 @@
 // Structs are used to name and package related values similar to tuples
 fn main() {
     //tuple
-    let rect: (i32, i32) = (200, 500);
+    let _rect: (i32, i32) = (200, 500);
 
     // Struct
     struct Book {
@@ -41,7 +41,7 @@ fn main() {
     }
 
     // Create instances from other instances
-    let user2: User = User {
+    let _user2: User = User {
         email: String::from("anotheremailuser2@m.com"),
         ..user1
     };
@@ -50,10 +50,10 @@ fn main() {
     struct Color(i32, i32, i32);
     struct Point(i32, i32, i32);
 
-    let black: Color = Color(0,0,0);
-    let white: Color = Color(255,255,255);
+    let _black: Color = Color(0,0,0);
+    let _white: Color = Color(255,255,255);
 
     // unit-like struck
     struct AlwaysEqual;
-    let subject: AlwaysEqual = AlwaysEqual;
+    let _subject: AlwaysEqual = AlwaysEqual;
 }
