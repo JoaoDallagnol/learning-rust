@@ -1,4 +1,4 @@
-// 1- Each value in rust has a variable that's its owner.
+// 1- Each value in rust has a variable that's called its owner.
 
 fn main() {
     let s1 = String::from("RUST");  

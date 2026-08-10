@@ -1,5 +1,30 @@
 // Structs
 // Structs are used to name and package related values similar to tuples
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+impl Rectangle {
+    fn square(size: u32) -> Rectangle {
+        Rectangle { 
+            width: size,
+            height: size 
+        }
+    }
+}
+
 fn main() {
     //tuple
     let _rect: (i32, i32) = (200, 500);
@@ -56,4 +81,29 @@ fn main() {
     // unit-like struck
     struct AlwaysEqual;
     let _subject: AlwaysEqual = AlwaysEqual;
+
+    println!("-------------------");
+    let rect = Rectangle {
+        width: 30,
+        height: 50
+    };
+
+    let rect1: Rectangle = Rectangle {
+        width: 20,
+        height: 40
+    };
+
+    let rect2: Rectangle = Rectangle {
+        width: 40,
+        height: 50
+    };
+
+    let rect3 = Rectangle::square(25);
+
+    println!("react: {:#?}", rect);
+    println!("The area of the rectangle is {} square pixels.", rect.area());
+
+    println!("react can hold react1: {}", rect.can_hold(&rect1));
+    println!("react can hold react2: {}", rect.can_hold(&rect2));
+
 }
