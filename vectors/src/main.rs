@@ -20,4 +20,32 @@ fn main() {
         Some(third) => println!("The third element from the GET is {}", third),
         None => println!("There is no third element"),
     }
+
+    for i in &mut _v {
+        *i += 50;
+    }
+
+    for i in &_v {
+        println!("{}", i);
+    }
+
+
+    //Storing Enum inside a vector
+    //Vector cam store only one type of data, but with enum we can store multiple types
+    enum SpreadsheetCell {
+        Int(i32),
+        Float(f64),
+        Text(String),
+    }
+
+    let row = vec![
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Text(String::from("blue")),
+        SpreadsheetCell::Float(10.12),
+    ];
+
+    match &row[1] {
+        SpreadsheetCell::Int(i) => println!("{}", i),
+        _ => println!("Not a integer!")
+    }
 }
