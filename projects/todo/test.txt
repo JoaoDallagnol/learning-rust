@@ -1,9 +1,4 @@
-I'm nobody! Who are you?
-Are you nobody, too?
-Then there's a pair of us - don't tell!
-They'd banish us, you know.
-
-How dreary to be somebody!
-How public, like a frog
-To tell your name the livelong day
-To an admiring bog!
+false|2026-08-19 09:00||Estudar ownership em Rust
+true|2026-08-19 09:30|2026-08-19 11:15|Implementar carregamento do arquivo
+false|2026-08-19 13:00||Criar comando list
+true|2026-08-19 14:20|2026-08-19 15:05|Separar Todo e TodoItem

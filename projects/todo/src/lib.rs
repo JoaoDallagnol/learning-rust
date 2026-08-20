@@ -1,4 +1,8 @@
-use std::{fs, time::SystemTime};
+use core::num;
+use std::fmt::Error;
+use std::fs;
+use std::time::SystemTime;
+use std::io::{self, Write, BufWriter};
 
 struct TodoItem {
     text: String,
@@ -39,5 +43,24 @@ impl Todo {
         })
     }
 
-    pub fn list(&self) {}
+    pub fn list(&self) -> Result<(), std::io::Error>{
+        let stdout = io::stdout();
+
+        // Buffered write for stdout stream
+        let mut writer = BufWriter::new(stdout);
+        let mut data = String::new();
+
+        for (index, item) in self.items.iter().enumerate() {
+            let index = index + 1;
+
+            data.push_str(&index.to_string());
+            data.push_str(". ");
+            data.push_str(&item.text);
+            data.push_str("\n\n");
+        }
+
+        writer.write_all(data.as_bytes())?;
+        writer.flush()?;
+        Ok(())
+    }
 }
