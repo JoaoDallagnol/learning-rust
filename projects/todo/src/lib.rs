@@ -3,6 +3,8 @@ use std::fs;
 use std::time::SystemTime;
 use std::io::{self, Write, BufWriter};
 
+use chrono::Local;
+
 struct TodoItem {
     text: String,
     is_done: bool,
@@ -106,4 +108,24 @@ impl Todo {
         writer.flush()?;
         Ok(())
     }
+
+    pub fn add_items(&self, args: &[String]) {
+        let items = format_input_data(args);
+        let mut lines: Vec<String> = Vec::new();
+        let time = Local::now().format("%Y-%m-%d %H:%M").to_string();
+
+        for item in items {
+            let line = format!("{}|{:?}||{}", false, time, item);
+            lines.push(line);
+        }
+    }
+}
+
+fn format_input_data(args: &[String]) -> Vec<String> {
+    args.join(" ")
+        .split(",")
+        .map(|part| part.trim())
+        .filter(|part| !part.is_empty())
+        .map(|part| part.to_string())
+        .collect::<Vec<String>>()
 }
