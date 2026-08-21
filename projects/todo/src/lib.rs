@@ -1,5 +1,3 @@
-use core::num;
-use std::fmt::Error;
 use std::fs;
 use std::time::SystemTime;
 use std::io::{self, Write, BufWriter};
@@ -7,13 +5,20 @@ use std::io::{self, Write, BufWriter};
 struct TodoItem {
     text: String,
     is_done: bool,
-    created_at: SystemTime,
-    completed_at: Option<SystemTime>,
+    created_at: String,
+    completed_at: String,
 }
 
 impl TodoItem {
     fn create_item(line: String) -> Self {
-        TodoItem { text: line, is_done: false, created_at: SystemTime::now(), completed_at: Some(SystemTime::now())}
+        let split_line: Vec<&str> = line.splitn(4, "|").collect();
+
+        TodoItem {
+            is_done: split_line[0].parse::<bool>().expect("Error to trying to parser boolean"),
+            created_at: split_line[1].to_string(),
+            completed_at: split_line[2].to_string(),
+            text: split_line[3].to_string()
+        }
     }
 }
 
@@ -55,7 +60,21 @@ impl Todo {
 
             data.push_str(&index.to_string());
             data.push_str(". ");
+            
+            match &item.is_done {
+                true => data.push_str("[x] "),
+                false => data.push_str("[ ] "),
+            }
+
             data.push_str(&item.text);
+            data.push_str("\nCriado em: ");
+            data.push_str(&item.created_at);
+
+            if *&item.completed_at.len() > 1 {
+                data.push_str("\nCompletado em: ");
+                data.push_str(&item.completed_at);
+            }
+
             data.push_str("\n\n");
         }
 

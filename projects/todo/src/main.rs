@@ -10,7 +10,7 @@ fn main() {
         let command = &args[1];
         match &command[..] {
             "list" => todo.list().expect("Error to list the file"),
-            &_ => todo!()
+            &_ => todo.list().expect("Error to list the file"),
         }
     } else {
         todo.list().expect("Error to list the file");
