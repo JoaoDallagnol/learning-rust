@@ -34,6 +34,7 @@ impl TodoItem {
 
 pub struct Todo {
     items: Vec<TodoItem>,
+    path: String,
     created_at: SystemTime,
     last_modified_at: SystemTime,
 }
@@ -54,6 +55,7 @@ impl Todo {
 
         Ok(Todo { 
             items: todo_items,
+            path,
             created_at: metadata.created()?,
             last_modified_at: metadata.modified()?
         })
@@ -65,6 +67,10 @@ impl Todo {
         // Buffered write for stdout stream
         let mut writer = BufWriter::new(stdout);
         let mut data = String::new();
+        data.push_str("-------");
+        data.push_str("File: ");
+        data.push_str(&self.path);
+        data.push_str("-------\n");
 
         for (index, item) in self.items.iter().enumerate() {
             let index = index + 1;
@@ -109,12 +115,12 @@ impl Todo {
     }
 
     pub fn add_items(&self, args: &[String]) {
-        if args.len() > 0 {
+        if !args.is_empty() {
             let lines = format_to_file_lines(args);
             let file  = OpenOptions::new()
                 .create(true)
                 .append(true)
-                .open("test.txt")
+                .open(&self.path)
                 .expect("Couldn't open the todofile!");
 
             let mut buffer = BufWriter::new(file);

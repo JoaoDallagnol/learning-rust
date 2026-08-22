@@ -15,3 +15,4 @@ false|2026-08-21 21:19||asdasd
 false|2026-08-21 21:19||dasd
 false|2026-08-21 21:19||e agora
 false|2026-08-21 21:21||experimentar sass
+false|2026-08-21 21:30||ajuste path todo struct
