@@ -1,4 +1,3 @@
-
 use std::fs::{self, OpenOptions};
 use std::time::SystemTime;
 use std::io::{self, Write, BufWriter};
@@ -110,19 +109,25 @@ impl Todo {
     }
 
     pub fn add_items(&self, args: &[String]) {
-        let lines = format_input_data(args);
-        let file  = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open("test.txt")
-            .expect("Couldn't open the todofile!");
+        if args.len() > 0 {
+            let lines = format_to_file_lines(args);
+            let file  = OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open("test.txt")
+                .expect("Couldn't open the todofile!");
 
-        let mut buffer = BufWriter::new(file);
-        buffer.write_all(lines.join("").as_bytes()).expect("Couldn't write to the file!");
+            let mut buffer = BufWriter::new(file);
+            buffer.write_all(lines
+                .join("")
+                .as_bytes())
+                .expect("Couldn't write to the file!");
+            buffer.flush().expect("Couldn't write to the file!");
+        }
     }
 }
 
-fn format_input_data(args: &[String]) -> Vec<String> {
+fn format_to_file_lines(args: &[String]) -> Vec<String> {
     let items = args.join(" ")
         .split(",")
         .map(|part| part.trim())
