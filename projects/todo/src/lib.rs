@@ -1,5 +1,5 @@
 
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::time::SystemTime;
 use std::io::{self, Write, BufWriter};
 
@@ -110,22 +110,33 @@ impl Todo {
     }
 
     pub fn add_items(&self, args: &[String]) {
-        let items = format_input_data(args);
-        let mut lines: Vec<String> = Vec::new();
-        let time = Local::now().format("%Y-%m-%d %H:%M").to_string();
+        let lines = format_input_data(args);
+        let file  = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open("test.txt")
+            .expect("Couldn't open the todofile!");
 
-        for item in items {
-            let line = format!("{}|{:?}||{}", false, time, item);
-            lines.push(line);
-        }
+        let mut buffer = BufWriter::new(file);
+        buffer.write_all(lines.join("").as_bytes()).expect("Couldn't write to the file!");
     }
 }
 
 fn format_input_data(args: &[String]) -> Vec<String> {
-    args.join(" ")
+    let items = args.join(" ")
         .split(",")
         .map(|part| part.trim())
         .filter(|part| !part.is_empty())
         .map(|part| part.to_string())
-        .collect::<Vec<String>>()
+        .collect::<Vec<String>>();
+
+    let mut lines: Vec<String> = Vec::new();
+    let time = Local::now().format("%Y-%m-%d %H:%M").to_string();
+
+    for item in items {
+        let line = format!("{}|{}||{}\n", false, time, item);
+        lines.push(line);
+    }
+
+    lines
 }

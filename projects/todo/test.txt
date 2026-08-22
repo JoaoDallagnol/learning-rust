@@ -2,3 +2,9 @@ false|2026-08-19 09:00||Estudar ownership em Rust
 true|2026-08-19 09:30|2026-08-19 11:15|Implementar carregamento do arquivo
 false|2026-08-19 13:00||Criar comando list
 true|2026-08-19 14:20|2026-08-19 15:05|Separar Todo e TodoItem
+false|2026-08-21 21:05||oito meu deus
+false|2026-08-21 21:05||e agora oq eu faço
+false|2026-08-21 21:05||mais um item
+false|2026-08-21 21:05||asdasd
+false|2026-08-21 21:05||dasd
+false|2026-08-21 21:05||e agora
