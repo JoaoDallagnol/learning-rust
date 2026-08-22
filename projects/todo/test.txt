@@ -16,3 +16,5 @@ false|2026-08-21 21:19||dasd
 false|2026-08-21 21:19||e agora
 false|2026-08-21 21:21||experimentar sass
 false|2026-08-21 21:30||ajuste path todo struct
+false|2026-08-21 21:36||fn rm
+false|2026-08-21 21:36||fn mark_as_done

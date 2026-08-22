@@ -2,7 +2,7 @@ use std::fs::{self, OpenOptions};
 use std::time::SystemTime;
 use std::io::{self, Write, BufWriter};
 
-use chrono::Local;
+use chrono::{DateTime, Local};
 
 struct TodoItem {
     text: String,
@@ -67,10 +67,19 @@ impl Todo {
         // Buffered write for stdout stream
         let mut writer = BufWriter::new(stdout);
         let mut data = String::new();
-        data.push_str("-------");
-        data.push_str("File: ");
+        let created_at: DateTime<Local> = self.created_at.into();
+        let last_modified_at: DateTime<Local> = self.last_modified_at.into();
+
+        data.push_str("==============================\n");
+        data.push_str("Todo file\n");
+        data.push_str("------------------------------\n");
+        data.push_str("Path: ");
         data.push_str(&self.path);
-        data.push_str("-------\n");
+        data.push_str("\nCreated at: ");
+        data.push_str(&created_at.format("%Y-%m-%d %H:%M").to_string());
+        data.push_str("\nLast modified: ");
+        data.push_str(&last_modified_at.format("%Y-%m-%d %H:%M").to_string());
+        data.push_str("\n==============================\n\n");
 
         for (index, item) in self.items.iter().enumerate() {
             let index = index + 1;
