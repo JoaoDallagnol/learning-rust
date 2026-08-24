@@ -1,4 +1,5 @@
 use std::fs::{self, OpenOptions};
+use std::num::ParseIntError;
 use std::time::SystemTime;
 use std::io::{self, Write, BufWriter};
 
@@ -138,6 +139,38 @@ impl Todo {
                 .as_bytes())
                 .expect("Couldn't write to the file!");
             buffer.flush().expect("Couldn't write to the file!");
+        }
+    }
+
+    pub fn remove_items(&self, args: &[String]) {
+        let input: Result<Vec<usize>, ParseIntError> = args.iter().map(|arg| arg.parse::<usize>()).collect();
+        
+        match input {
+            Ok(mut positions ) => {
+                positions.sort();
+                positions.reverse();
+
+                let contents = fs::read_to_string(&self.path).expect("Couldn't open the todofile!");
+                let mut text: Vec<String> = contents.lines().map(|line| line.to_string()).collect();
+                for pos in positions {
+                    text.remove(pos - 1);
+                }
+
+                let file = OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .truncate(true)
+                    .open(&self.path)
+                    .expect("Couldn't open the todofile!");
+                
+                let mut buffer = BufWriter::new(file);
+                buffer.write_all(text
+                    .join("\n")
+                    .as_bytes())
+                    .expect("Couldn't update the todofile!");
+                buffer.flush().expect("Couldn't update the todofile!");
+            }
+            Err(err) => println!("Error indexes type: {}", err),
         }
     }
 }
