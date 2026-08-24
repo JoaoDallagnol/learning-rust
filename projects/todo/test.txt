@@ -1,2 +1,4 @@
-false|2026-08-24 17:01||verificar ajustes
-false|2026-08-24 17:01||fazer funcionalidade de marcar como concluido
+false|2026-08-24 17:26||validar 0
+false|2026-08-24 17:26||numero maior q a lista
+false|2026-08-24 17:26||numero duplicado
+false|2026-08-24 17:39||verificar melhorias

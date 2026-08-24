@@ -156,6 +156,9 @@ impl Todo {
                     text.remove(pos - 1);
                 }
 
+                let mut output = text.join("\n");
+                output.push_str("\n");
+
                 let file = OpenOptions::new()
                     .create(true)
                     .write(true)
@@ -164,10 +167,7 @@ impl Todo {
                     .expect("Couldn't open the todofile!");
                 
                 let mut buffer = BufWriter::new(file);
-                buffer.write_all(text
-                    .join("\n")
-                    .as_bytes())
-                    .expect("Couldn't update the todofile!");
+                buffer.write_all(output.as_bytes()).expect("Couldn't update the todofile!");
                 buffer.flush().expect("Couldn't update the todofile!");
             }
             Err(err) => println!("Error indexes type: {}", err),
