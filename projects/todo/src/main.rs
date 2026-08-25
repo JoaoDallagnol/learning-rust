@@ -12,6 +12,7 @@ fn main() {
             "list" => todo.list().expect("Error to list the file"),
             "add" => todo.add_items(&args[2..]),
             "rm" => todo.remove_items(&args[2..]),
+            "done" => todo.checkbox_update(&args[2..]),
             &_ => todo.list().expect("Error to list the file"),
         }
     } else {
