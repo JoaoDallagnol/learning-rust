@@ -146,14 +146,20 @@ impl Todo {
         let input: Result<Vec<usize>, ParseIntError> = args.iter().map(|arg| arg.parse::<usize>()).collect();
         
         match input {
-            Ok(mut positions ) => {
-                positions.sort();
-                positions.reverse();
-
+            Ok(positions ) => {
                 let contents = fs::read_to_string(&self.path).expect("Couldn't open the todofile!");
                 let mut text: Vec<String> = contents.lines().map(|line| line.to_string()).collect();
-                for pos in positions {
-                    text.remove(pos - 1);
+
+                match validate_args(positions, &text) {
+                    Ok(indexes) => {
+                        for pos in  indexes {
+                            text.remove(pos - 1);
+                        }
+                    }
+                    Err(err) => {
+                        println!("Invalid args: {}", err);
+                        return;
+                    }
                 }
 
                 let mut output = text.join("\n");
@@ -192,4 +198,24 @@ fn format_to_file_lines(args: &[String]) -> Vec<String> {
     }
 
     lines
+}
+
+fn validate_args(mut pos: Vec<usize>, text: &[String]) -> Result<Vec<usize>, String> {
+    if pos.is_empty() {
+        return Err("Should pass an index after the rm command!".to_string());
+    }
+
+    pos.sort();
+    pos.dedup();
+
+    if pos[0] == 0 {
+        return Err("Cannot remove item 0!".to_string());
+    }
+
+    pos.reverse();
+    if pos[0] > text.len() {
+        return Err("Index out of scope for todo list!".to_string());
+    }
+
+    Ok(pos)
 }
