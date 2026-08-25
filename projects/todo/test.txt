@@ -1,2 +1,2 @@
-false|2026-08-24 17:26||numero maior q a lista
+true|2026-08-24 17:26|2026-08-25 15:05|numero maior q a lista
 false|2026-08-24 17:39||verificar melhorias

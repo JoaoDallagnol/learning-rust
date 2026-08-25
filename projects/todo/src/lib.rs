@@ -194,17 +194,11 @@ impl Todo {
         }
     }
 
-    pub fn checkbox_update(&self, args: &[String]) {
+    pub fn toggle(&self, args: &[String]) {
         let input: Result<Vec<usize>, ParseIntError> = args.iter().map(|arg| arg.parse::<usize>()).collect();
         
         match input {
             Ok(positions ) => {
-
-                // Reading the text lines from the file
-                // let contents = fs::read_to_string(&self.path).expect("Couldn't open the todofile!");
-                // let mut text: Vec<String> = contents.lines().map(|line| line.to_string()).collect();
-
-                // Reading the text lines from the TodoItem struct
                 let mut text: Vec<String> = Vec::new();
                 for item in &self.items {
                     let completed_at = match &item.completed_at {
@@ -219,23 +213,17 @@ impl Todo {
                 match validate_args(positions, &text) {
                     Ok(indexes) => {
                         for pos in  indexes {
-
-                            // replacing old line for the new one
-                            text[pos - 1] = match text[pos - 1].split_once("|") {
-                                Some(line_split) => {
-                                    if line_split.0 == "false" {
-                                        format!("{}|{}", true, line_split.1)
-                                    } else if line_split.0 == "true" {
-                                        format!("{}|{}", false, line_split.1)
-                                    } else {
-                                        panic!("Couldn't update todo item!")
-                                    }
-                                }
-                                None => panic!("Couldn't update todo item!")
-                            };
+                            let text_part: Vec<&str> =  text[pos - 1].splitn(4,"|").collect();
+                            if text_part[0] == "false" {
+                                let completed_at = Local::now().format("%Y-%m-%d %H:%M").to_string();
+                                text[pos - 1] =  format!("{}|{}|{}|{}", true, text_part[1], completed_at, text_part[3]);
+                            } else if text_part[0] == "true" {
+                                text[pos - 1] = format!("{}|{}|{}|{}", false, text_part[1], "", text_part[3]);
+                            } else {
+                                panic!("Couldn't update todo item!")
+                            }
                         }
-                    }
-                    Err(err) => {
+                    } Err(err) => {
                         println!("Invalid args: {}", err);
                         return;
                     }
