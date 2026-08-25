@@ -143,108 +143,44 @@ impl Todo {
     }
 
     pub fn remove_items(&self, args: &[String]) {
-        let input: Result<Vec<usize>, ParseIntError> = args.iter().map(|arg| arg.parse::<usize>()).collect();
-        
-        match input {
-            Ok(positions ) => {
-
-                // Reading the text lines from the file
-                // let contents = fs::read_to_string(&self.path).expect("Couldn't open the todofile!");
-                // let mut text: Vec<String> = contents.lines().map(|line| line.to_string()).collect();
-
-                // Reading the text lines from the TodoItem struct
-                let mut text: Vec<String> = Vec::new();
-                for item in &self.items {
-                    let completed_at = match &item.completed_at {
-                        Some(value) => value.as_str(),
-                        None => "",
-                    };
-                    let line = format!("{}|{}|{}|{}", item.is_done, item.created_at, completed_at, item.text);
-
-                    text.push(line);
+        let mut text = format_items_to_file_lines(&self.items);
+        match parse_and_validate_positions(args, &text) {
+            Ok(indexes) => {
+                for pos in  indexes {
+                    text.remove(pos - 1);
                 }
-
-                match validate_args(positions, &text) {
-                    Ok(indexes) => {
-                        for pos in  indexes {
-                            text.remove(pos - 1);
-                        }
-                    }
-                    Err(err) => {
-                        println!("Invalid args: {}", err);
-                        return;
-                    }
-                }
-
-                let mut output = text.join("\n");
-                output.push_str("\n");
-
-                let file = OpenOptions::new()
-                    .create(true)
-                    .write(true)
-                    .truncate(true)
-                    .open(&self.path)
-                    .expect("Couldn't open the todofile!");
-                
-                let mut buffer = BufWriter::new(file);
-                buffer.write_all(output.as_bytes()).expect("Couldn't update the todofile!");
-                buffer.flush().expect("Couldn't update the todofile!");
             }
-            Err(err) => println!("Error indexes type: {}", err),
+            Err(err) => {
+                println!("Invalid args: {}", err);
+                return;
+            }
         }
+
+        persist_todo_file(&self.path, text).expect("Couldn't update the todofile!");
     }
 
     pub fn toggle(&self, args: &[String]) {
-        let input: Result<Vec<usize>, ParseIntError> = args.iter().map(|arg| arg.parse::<usize>()).collect();
-        
-        match input {
-            Ok(positions ) => {
-                let mut text: Vec<String> = Vec::new();
-                for item in &self.items {
-                    let completed_at = match &item.completed_at {
-                        Some(value) => value.as_str(),
-                        None => "",
-                    };
-                    let line = format!("{}|{}|{}|{}", item.is_done, item.created_at, completed_at, item.text);
-
-                    text.push(line);
-                }
-
-                match validate_args(positions, &text) {
-                    Ok(indexes) => {
-                        for pos in  indexes {
-                            let text_part: Vec<&str> =  text[pos - 1].splitn(4,"|").collect();
-                            if text_part[0] == "false" {
-                                let completed_at = Local::now().format("%Y-%m-%d %H:%M").to_string();
-                                text[pos - 1] =  format!("{}|{}|{}|{}", true, text_part[1], completed_at, text_part[3]);
-                            } else if text_part[0] == "true" {
-                                text[pos - 1] = format!("{}|{}|{}|{}", false, text_part[1], "", text_part[3]);
-                            } else {
-                                panic!("Couldn't update todo item!")
-                            }
-                        }
-                    } Err(err) => {
-                        println!("Invalid args: {}", err);
-                        return;
+        let mut text = format_items_to_file_lines(&self.items);
+        match parse_and_validate_positions(args, &text) {
+            Ok(indexes) => {
+                for pos in  indexes {
+                    let text_part: Vec<&str> =  text[pos - 1].splitn(4,"|").collect();
+                    if text_part[0] == "false" {
+                        let completed_at = Local::now().format("%Y-%m-%d %H:%M").to_string();
+                        text[pos - 1] =  format!("{}|{}|{}|{}", true, text_part[1], completed_at, text_part[3]);
+                    } else if text_part[0] == "true" {
+                        text[pos - 1] = format!("{}|{}|{}|{}", false, text_part[1], "", text_part[3]);
+                    } else {
+                        panic!("Couldn't update todo item!")
                     }
                 }
-
-                let mut output = text.join("\n");
-                output.push_str("\n");
-
-                let file = OpenOptions::new()
-                    .create(true)
-                    .write(true)
-                    .truncate(true)
-                    .open(&self.path)
-                    .expect("Couldn't open the todofile!");
-                
-                let mut buffer = BufWriter::new(file);
-                buffer.write_all(output.as_bytes()).expect("Couldn't update the todofile!");
-                buffer.flush().expect("Couldn't update the todofile!");
+            } Err(err) => {
+                println!("Invalid args: {}", err);
+                return;
             }
-            Err(err) => println!("Error indexes type: {}", err),
         }
+
+        persist_todo_file(&self.path, text).expect("Couldn't update the todofile!");
     }
 }
 
@@ -286,3 +222,46 @@ fn validate_args(mut pos: Vec<usize>, text: &[String]) -> Result<Vec<usize>, Str
 
     Ok(pos)
 }
+
+fn format_items_to_file_lines(items: &[TodoItem]) -> Vec<String> {
+    let mut text: Vec<String> = Vec::new();
+    for item in items {
+        let completed_at = match &item.completed_at {
+            Some(value) => value.as_str(),
+            None => "",
+        };
+        let line = format!("{}|{}|{}|{}", item.is_done, item.created_at, completed_at, item.text);
+
+        text.push(line);
+    }
+
+    text
+}
+
+fn persist_todo_file(path: &str, text: Vec<String>) -> Result<(), std::io::Error>{
+    let mut output = text.join("\n");
+    output.push_str("\n");
+
+    let file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(path)?;
+    
+    let mut buffer = BufWriter::new(file);
+    buffer.write_all(output.as_bytes())?;
+    buffer.flush()?;
+    Ok(())
+}
+
+fn parse_and_validate_positions(args: &[String], lines: &[String]) -> Result<Vec<usize>, String> {
+    let positions: Result<Vec<usize>, ParseIntError> = args
+        .iter()
+        .map(|arg| arg.parse::<usize>())
+        .collect();
+
+    match positions {
+        Ok(positions) => validate_args(positions, lines),
+        Err(err) => Err(format!("Error indexes type: {}", err)),
+    }
+} 

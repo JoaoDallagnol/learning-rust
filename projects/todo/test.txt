@@ -1,2 +1,4 @@
-true|2026-08-24 17:26|2026-08-25 15:05|numero maior q a lista
 false|2026-08-24 17:39||verificar melhorias
+true|2026-08-25 17:15|2026-08-25 17:16|verificar ajustes finais do projeto
+false|2026-08-25 17:15||gerar build
+false|2026-08-25 17:15||executar binario
