@@ -147,8 +147,22 @@ impl Todo {
         
         match input {
             Ok(positions ) => {
-                let contents = fs::read_to_string(&self.path).expect("Couldn't open the todofile!");
-                let mut text: Vec<String> = contents.lines().map(|line| line.to_string()).collect();
+
+                // Reading the text lines from the file
+                // let contents = fs::read_to_string(&self.path).expect("Couldn't open the todofile!");
+                // let mut text: Vec<String> = contents.lines().map(|line| line.to_string()).collect();
+
+                // Reading the text lines from the TodoItem struct
+                let mut text: Vec<String> = Vec::new();
+                for item in &self.items {
+                    let completed_at = match &item.completed_at {
+                        Some(value) => value.as_str(),
+                        None => "",
+                    };
+                    let line = format!("{}|{}|{}|{}", item.is_done, item.created_at, completed_at, item.text);
+
+                    text.push(line);
+                }
 
                 match validate_args(positions, &text) {
                     Ok(indexes) => {

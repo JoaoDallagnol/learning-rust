@@ -1,4 +1,2 @@
-false|2026-08-24 17:26||validar 0
 false|2026-08-24 17:26||numero maior q a lista
-false|2026-08-24 17:26||numero duplicado
 false|2026-08-24 17:39||verificar melhorias
