@@ -1,5 +1,7 @@
 #![allow(unused)] //For begenning only
 
+use crate::model::ModelController;
+
 pub use self::error::{Error, Result};
 
 use std::{fmt::format, net::SocketAddr};
@@ -11,12 +13,17 @@ use tower_http::services::ServeDir;
 
 mod error;
 mod web;
+mod model;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
+    // Initialize ModelController
+    let mc = ModelController::new().await?;
+
    let routes = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .nest("/api", web::routes_tickets::routes(mc.clone()))
         .layer(middleware::map_response(main_reponse_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
@@ -25,7 +32,9 @@ async fn main() {
    println!("LISTENING on {:?}\n", addr);
    axum::Server::bind(&addr)
     .serve(routes.into_make_service())
-    .await.unwrap()
+    .await.unwrap();
+
+    Ok(())
 }
 
 async fn main_reponse_mapper(res: Response) -> Response {
