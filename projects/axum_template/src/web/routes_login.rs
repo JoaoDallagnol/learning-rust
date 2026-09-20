@@ -11,11 +11,14 @@ pub fn routes() -> Router {
 
 async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json<Value>> {
     println!("->> {:<12} - api_login", "HANDLER");
-    if payload.username !="demo1" || payload.pwd !="welcome" {
+    if payload.username != "demo1" || payload.pwd != "welcome" {
         return Err(Error::LoginFail);
     }
 
-    cookies.add(Cookie::new(web::AUTH_TOKEN, "user-1.exp.sign"));
+    let mut cookie = Cookie::new(web::AUTH_TOKEN, "user-1.exp.sign");
+    cookie.set_http_only(true);
+    cookie.set_path("/");
+    cookies.add(cookie);
 
     let body = Json(json!({
         "result": {
@@ -30,5 +33,4 @@ async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json
 struct LoginPayload {
     username: String,
     pwd: String,
-
 }
