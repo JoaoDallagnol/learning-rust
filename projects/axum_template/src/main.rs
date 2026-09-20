@@ -1,4 +1,4 @@
-#![allow(unused)] //For begenning only
+#![allow(unused)] // Keep unused warnings quiet while learning.
 
 use crate::ctx::Ctx;
 use crate::log::log_request;
@@ -31,12 +31,14 @@ mod web;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // Initialize ModelController
+    // Create the shared application state.
     let mc = ModelController::new().await?;
 
+    // Protect all ticket routes with the auth middleware.
     let routes_apis = web::routes_tickets::routes(mc.clone())
         .route_layer(middleware::from_fn(web::mw_auth::mw_require_auth));
 
+    // Build the full router tree.
     let routes = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
@@ -70,9 +72,11 @@ async fn main_response_mapper(
 ) -> Response {
     println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
 
+    // Convert the extractor result into an optional request context.
     let ctx = ctx.ok();
     let uuid = Uuid::new_v4();
 
+    // Read the service error stored by Error::into_response.
     let service_error = res.extensions().get::<Error>();
     let client_status_error = service_error.map(|se| se.client_status_and_error());
 
@@ -100,6 +104,7 @@ async fn main_response_mapper(
 }
 
 fn routes_static() -> axum::routing::MethodRouter {
+    // Return a simple 404 when the static file is missing.
     async fn handle_404() -> (StatusCode, &'static str) {
         (StatusCode::NOT_FOUND, "Resource not found.")
     }
@@ -108,6 +113,7 @@ fn routes_static() -> axum::routing::MethodRouter {
 }
 
 fn routes_hello() -> Router {
+    // Register small public routes used for learning extractors.
     Router::new()
         .route("/hello", get(handler_hello))
         .route("/hello2/{name}", get(handler_hello2))

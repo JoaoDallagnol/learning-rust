@@ -16,11 +16,12 @@ pub struct TicketForCreate {
 
 #[derive(Clone)]
 pub struct ModelController {
+    // In-memory storage shared by all handlers.
     tickets_store: Arc<Mutex<Vec<Option<Ticket>>>>,
 }
 
-//Constructor
 impl ModelController {
+    // Create an empty model controller.
     pub async fn new() -> Result<Self> {
         Ok(Self {
             tickets_store: Arc::default(),
@@ -28,7 +29,6 @@ impl ModelController {
     }
 }
 
-//CRUD
 impl ModelController {
     pub async fn create_ticket(&self, ctx: Ctx, ticket_fc: TicketForCreate) -> Result<Ticket> {
         let mut store = self.tickets_store.lock().unwrap();
@@ -50,6 +50,7 @@ impl ModelController {
 
     pub async fn delete_ticket(&self, _ctx: Ctx, id: u64) -> Result<Ticket> {
         let mut store = self.tickets_store.lock().unwrap();
+        // take() removes the ticket while leaving an empty slot behind.
         let ticket = store.get_mut(id as usize).and_then(|t| t.take());
         ticket.ok_or(Error::TicketDeleteFailIdNotFound { id })
     }

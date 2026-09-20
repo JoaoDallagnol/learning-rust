@@ -7,6 +7,7 @@ use crate::ctx::Ctx;
 use crate::model::{ModelController, Ticket, TicketForCreate};
 
 pub fn routes(mc: ModelController) -> Router {
+    // Attach ticket handlers to the shared model state.
     Router::new()
         .route("/ticket", post(create_ticket).get(list_ticket))
         .route("/tickets/{id}", delete(delete_ticket))
@@ -20,6 +21,7 @@ async fn create_ticket(
 ) -> Result<Json<Ticket>> {
     println!("->> {:<12} - create_ticket", "HANDLER");
 
+    // The Ctx extractor provides the authenticated user id.
     let ticket = mc.create_ticket(ctx, ticket_fc).await?;
 
     Ok(Json(ticket))

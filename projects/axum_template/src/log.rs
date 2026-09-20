@@ -16,6 +16,7 @@ pub async fn log_request(
     service_error: Option<&Error>,
     client_error: Option<ClientError>,
 ) -> Result<()> {
+    // Use a simple timestamp for the demo log line.
     let timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
@@ -26,6 +27,7 @@ pub async fn log_request(
         .ok()
         .and_then(|mut v| v.get_mut("data").map(|v| v.take()));
 
+    // Build one structured log entry for the request.
     let log_line = RequestLogLine {
         uuid: uuid.to_string(),
         timestamp: timestamp.to_string(),

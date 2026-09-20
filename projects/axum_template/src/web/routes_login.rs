@@ -11,10 +11,12 @@ pub fn routes() -> Router {
 
 async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json<Value>> {
     println!("->> {:<12} - api_login", "HANDLER");
+    // Demo credentials used by the course example.
     if payload.username != "demo1" || payload.pwd != "welcome" {
         return Err(Error::LoginFail);
     }
 
+    // Store a simple demo auth token in a cookie.
     let mut cookie = Cookie::new(web::AUTH_TOKEN, "user-1.exp.sign");
     cookie.set_http_only(true);
     cookie.set_path("/");

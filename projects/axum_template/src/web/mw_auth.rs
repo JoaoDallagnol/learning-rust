@@ -14,6 +14,7 @@ use crate::{Error, Result};
 
 pub async fn mw_require_auth(ctx: Result<Ctx>, req: Request<Body>, next: Next) -> Result<Response> {
     println!("->> {:<12} - mw_require_auth - {ctx:?}", "MIDDLEWARE");
+    // Stop the request if the context resolver found no valid user.
     ctx?;
     Ok(next.run(req).await)
 }
@@ -26,6 +27,7 @@ pub async fn mw_ctx_resolver(
 ) -> Result<Response> {
     println!("->> {:<12} - mw_ctx_resolver", "MIDDLEWARE");
 
+    // Read the auth cookie and turn it into a request context.
     let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
 
     let result_ctx = match auth_token
@@ -37,11 +39,13 @@ pub async fn mw_ctx_resolver(
     };
 
     if result_ctx.is_err() && !matches!(result_ctx, Err(Error::AuthFailNoAuthTokenCookie)) {
+        // Clear malformed auth cookies.
         let mut cookie = Cookie::new(AUTH_TOKEN, "");
         cookie.set_path("/");
         cookies.remove(cookie);
     }
 
+    // Store Result<Ctx> so later extractors can read it.
     req.extensions_mut().insert(result_ctx);
 
     Ok(next.run(req).await)
@@ -53,6 +57,7 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
         println!("->> {:<12} - Ctx", "EXTRACTOR");
 
+        // Pull the context resolved earlier by mw_ctx_resolver.
         parts
             .extensions
             .get::<Result<Ctx>>()
@@ -62,6 +67,7 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
 }
 
 fn parse_token(token: String) -> Result<(u64, String, String)> {
+    // Expected token format: user-[id].[expiration].[signature].
     let (_whole, user_id, exp, sign) = regex_captures!(r#"^user-(\d+)\.(.+)\.(.+)"#, &token)
         .ok_or(Error::AuthFailTokenWrongFormat)?;
 

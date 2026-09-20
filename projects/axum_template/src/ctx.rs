@@ -1,10 +1,11 @@
 #[derive(Clone, Debug)]
 pub struct Ctx {
+    // Authenticated user id for the current request.
     user_id: u64,
 }
 
-// Constructor
 impl Ctx {
+    // Create a request context for one user.
     pub fn new(user_id: u64) -> Self {
         Self { user_id }
     }
