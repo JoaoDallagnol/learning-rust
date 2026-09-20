@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use axum::RequestPartsExt;
+use axum::body::Body;
 use axum::extract::{FromRequestParts, State};
 use axum::http::Request;
 use axum::http::request::Parts;
@@ -13,21 +12,17 @@ use crate::model::ModelController;
 use crate::web::AUTH_TOKEN;
 use crate::{Error, Result};
 
-pub async fn mw_require_auth<B>(
-    ctx: Result<Ctx>,
-    req: Request<B>,
-    next: Next<B>,
-) -> Result<Response> {
+pub async fn mw_require_auth(ctx: Result<Ctx>, req: Request<Body>, next: Next) -> Result<Response> {
     println!("->> {:<12} - mw_require_auth - {ctx:?}", "MIDDLEWARE");
     ctx?;
     Ok(next.run(req).await)
 }
 
-pub async fn mw_ctx_resolver<B>(
+pub async fn mw_ctx_resolver(
     _mc: State<ModelController>,
     cookies: Cookies,
-    mut req: Request<B>,
-    next: Next<B>,
+    mut req: Request<Body>,
+    next: Next,
 ) -> Result<Response> {
     println!("->> {:<12} - mw_ctx_resolver", "MIDDLEWARE");
 
@@ -52,7 +47,6 @@ pub async fn mw_ctx_resolver<B>(
     Ok(next.run(req).await)
 }
 
-#[async_trait]
 impl<S: Send + Sync> FromRequestParts<S> for Ctx {
     type Rejection = Error;
 

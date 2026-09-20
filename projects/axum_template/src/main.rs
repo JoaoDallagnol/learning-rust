@@ -6,7 +6,7 @@ use crate::model::ModelController;
 
 pub use self::error::{Error, Result};
 
-use std::{fmt::format, net::SocketAddr};
+use std::fmt::format;
 
 use axum::{
     Json, Router,
@@ -49,12 +49,15 @@ async fn main() -> Result<()> {
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
-    println!("LISTENING on {:?}\n", addr);
-    axum::Server::bind(&addr)
-        .serve(routes.into_make_service())
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8080")
         .await
-        .unwrap();
+        .map_err(|err| format!("Cannot start TcpListener. \nCause: {err}"))?;
+
+    println!("LISTENING on {:?}\n", listener.local_addr());
+
+    axum::serve(listener, routes)
+        .await
+        .map_err(|err| format!("Cannot start axum::serve. \nCause: {err}"))?;
 
     Ok(())
 }
@@ -107,7 +110,7 @@ fn routes_static() -> axum::routing::MethodRouter {
 fn routes_hello() -> Router {
     Router::new()
         .route("/hello", get(handler_hello))
-        .route("/hello2/:name", get(handler_hello2))
+        .route("/hello2/{name}", get(handler_hello2))
 }
 
 #[derive(Debug, Deserialize)]

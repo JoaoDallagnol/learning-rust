@@ -9,7 +9,7 @@ use crate::model::{ModelController, Ticket, TicketForCreate};
 pub fn routes(mc: ModelController) -> Router {
     Router::new()
         .route("/ticket", post(create_ticket).get(list_ticket))
-        .route("/tickets/:id", delete(delete_ticket))
+        .route("/tickets/{id}", delete(delete_ticket))
         .with_state(mc)
 }
 
