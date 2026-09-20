@@ -20,17 +20,20 @@ async fn main() -> Result<()> {
     // Initialize ModelController
     let mc = ModelController::new().await?;
 
-   let routes = Router::new()
+    let routes_apis = web::routes_tickets::routes(mc.clone())
+        .route_layer(middleware::from_fn(web::mw_auth::mw_require_auth));
+
+    let routes = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
-        .nest("/api", web::routes_tickets::routes(mc.clone()))
+        .nest("/api", routes_apis)
         .layer(middleware::map_response(main_reponse_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
 
-   let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
-   println!("LISTENING on {:?}\n", addr);
-   axum::Server::bind(&addr)
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    println!("LISTENING on {:?}\n", addr);
+    axum::Server::bind(&addr)
     .serve(routes.into_make_service())
     .await.unwrap();
 

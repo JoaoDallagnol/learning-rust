@@ -18,7 +18,7 @@ async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json
     cookies.add(Cookie::new(web::AUTH_TOKEN, "user-1.exp.sign"));
 
     let body = Json(json!({
-        "resulst": {
+        "result": {
             "success": true
         }
     }));
